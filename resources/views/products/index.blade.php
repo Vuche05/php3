@@ -25,9 +25,9 @@
                         <th>ID</th>
                         <th>Tên sản phẩm</th>
                         <th>Danh mục</th>
+                        <th>Thương hiệu</th>
                         <th>Giá</th>
                         <th>Số lượng</th>
-                        {{-- <th>Giảm giá</th> --}}
                         <th>Hình ảnh</th>
                         <th>Thao tác</th>
                     </tr>
@@ -38,9 +38,9 @@
                             <td>{{ $product->id }}</td>
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->category->name }}</td>
+                            <td>{{ $product->brand->name }}</td>
                             <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
                             <td>{{ $product->quantity }}</td>
-                            {{-- <td>{{ $product->discount }}%</td> --}}
                             <td>
                                 @if ($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-height: 50px;">
@@ -63,7 +63,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-3">Không có sản phẩm nào</td>
+                            <td colspan="8" class="text-center py-3">Không có sản phẩm nào</td>
                         </tr>
                     @endforelse
                 </tbody>

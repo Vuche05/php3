@@ -1,6 +1,11 @@
 @extends('layout.master')
 
 @section('content')
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
@@ -19,6 +24,14 @@
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <select name="brand" class="form-select" style="max-width: 150px;">
+                        <option value="">Tất cả thương hiệu</option>
+                        @foreach($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }}
                             </option>
                         @endforeach
                     </select>
@@ -42,13 +55,14 @@
     </div>
 
     <!-- Show search results if search is active -->
-    @if(request('search') || request('category'))
+    @if(request('search') || request('category') || request('brand'))
     <div class="row mb-3">
         <div class="col-12">
             <div class="alert alert-info">
-                Kết quả tìm kiếm {{ request('search') ? 'cho "' . request('search') . '"' : '' }}
-                {{ request('category') && request('search') ? ' trong danh mục' : (request('category') ? 'trong danh mục' : '') }}
-                {{ request('category') ? ' "' . $categories->firstWhere('id', request('category'))->name . '"' : '' }}
+                Kết quả tìm kiếm 
+                {{ request('search') ? 'cho "' . request('search') . '"' : '' }}
+                {{ request('category') ? ' trong danh mục "' . $categories->firstWhere('id', request('category'))->name . '"' : '' }}
+                {{ request('brand') ? ' của thương hiệu "' . $brands->firstWhere('id', request('brand'))->name . '"' : '' }}
                 <a href="{{ route('home') }}" class="float-end"><i class="fas fa-times"></i> Xóa bộ lọc</a>
             </div>
         </div>
@@ -83,7 +97,10 @@
                         </div>
                     </div>
                     <div class="card-body p-2">
-                        <span class="category-badge">{{ $product->category->name }}</span>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="category-badge">{{ $product->category->name }}</span>
+                            <span class="brand-badge text-muted">{{ $product->brand->name }}</span>
+                        </div>
                         <h5 class="card-title product-title">
                             <a href="{{ route('product.show', $product) }}" class="text-decoration-none text-dark">{{ $product->name }}</a>
                         </h5>
@@ -101,7 +118,9 @@
                                 <span class="fw-bold fs-5">{{ number_format($product->price, 0, ',', '.') }} đ</span>
                             </div>
                         @endif
-                        <a href="{{ route('product.show', $product) }}" class="btn btn-outline-web btn-sm w-100">Mua Ngay</a>
+                        <a href="{{ route('product.show', $product) }}" class="btn btn-web btn-sm d-flex align-items-center justify-content-center">
+                            Mua ngay 
+                        </a>
                     </div>
                 </div>
             </div>

@@ -7,10 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['name', 'price', 'quantity', 'image', 'description', 'discount', 'category_id'];
+    use HasFactory;
+
+    protected $fillable = [
+        'name', 
+        'price', 
+        'quantity', 
+        'category_id', 
+        'brand_id',     
+        'description', 
+        'discount', 
+        'image'
+    ];
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

@@ -20,8 +20,9 @@ return new class extends Migration
             $table->string('password');
             $table->string('google_id')->nullable();
             $table->string('facebook_id')->nullable();
+            $table->string('fullname')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('role')->default('user');
+            $table->enum('role', ['admin', 'user'])->default('user'); // Thêm role
             $table->rememberToken();
             $table->timestamps();
         });

@@ -16,10 +16,9 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->isAdmin()) {
-            return $next($request);
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return response()->view('errors.no-access', [], 403);
         }
-        
-        return redirect('/')->with('error', 'Bạn không có quyền truy cập vào trang này!');
+        return $next($request);
     }
 }

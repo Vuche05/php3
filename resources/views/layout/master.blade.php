@@ -195,58 +195,6 @@
         .stats-card.danger {
             border-left-color: #dc3545;
         }
-        
-        /* Avatar styles from second master */
-        .avatar-container {
-            position: relative;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .dropdown-menu {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 250px;
-            padding: 10px;
-        }
-
-        .dropdown-menu .dropdown-item {
-            padding: 10px 15px;
-            border-radius: 5px;
-        }
-
-        .dropdown-menu .dropdown-item:hover {
-            background-color: #f0f2f5;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .user-info img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .user-info .user-name {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .user-info .user-handle {
-            color: #606770;
-            font-size: 14px;
-        }
     </style>
     
     @yield('styles')
@@ -255,79 +203,91 @@
     <!-- Header/Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-web">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('products.user') }}">
-                <i class="fas fa-store me-2"></i>
-                Shop Management
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <img src="{{ asset('img/logo.png') }}" alt="Logo" width="40" height="40" class="me-2">
+                VSKINCARE
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
+                    {{-- Common Navigation Items --}}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">
                             <i class="fas fa-home"></i> Trang chủ
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('categories.index') }}">
-                            <i class="fas fa-list"></i> Danh mục
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('products.index') }}">
-                            <i class="fas fa-box"></i> Sản phẩm
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('brands.index') }}">
-                            <i class="fas fa-box"></i> Thương hiệu
-                        </a>
-                    </li>
+    
+                    {{-- Admin-Specific Navigation Items --}}
+                    @if(Auth::check() && Auth::user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('categories.index') }}">
+                                <i class="fas fa-list"></i> Danh mục
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('products.index') }}">
+                                <i class="fas fa-box"></i> Sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('brands.index') }}">
+                                <i class="fas fa-star"></i> Thương hiệu
+                            </a>
+                        </li>
+                    @endif
                 </ul>
-                <div class="d-flex align-items-center">
-                    <a href="#" class="btn btn-outline-light me-2">
+                <div class="d-flex">
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-light me-2">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="badge bg-danger">0</span>
                     </a>
                     
-                    @if (Auth::check())
-                        <div class="avatar-container">
-                            <img src="{{ asset('images/avatar-placeholder.png') }}" class="avatar" alt="Avatar" data-bs-toggle="dropdown" aria-expanded="false">
+                    @guest
+                        <a href="{{ route('login') }}" class="btn btn-outline-light me-2">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                        </a>
+                        <a href="{{ route('register') }}" class="btn btn-outline-light">
+                            <i class="fas fa-user-plus"></i> Đăng ký
+                        </a>
+                    @else
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ Auth::user()->username }}
+                                @if(Auth::user()->isAdmin())
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                @endif
+                            </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li class="user-info">
-                                    <img src="{{ asset('images/avatar-placeholder.png') }}" alt="User Avatar">
-                                    <div>
-                                        <div class="user-name">{{ Auth::user()->name }}</div>
-                                        <div class="user-handle">{{ Auth::user()->email }}</div>
-                                    </div>
-                                </li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
+                                @if(Auth::user()->isAdmin())
+                                    <li><a class="dropdown-item" href="#">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Quản trị
+                                    </a></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    <form action="{{ route('logout') }}" method="POST">
                                         @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
                         </div>
-                    @else
-                        <a href="{{ route('register') }}" class="btn btn-outline-light me-2">Đăng ký</a>
-                        <a href="{{ route('login') }}" class="btn btn-light">Đăng nhập</a>
-                    @endif
+                    @endguest
                 </div>
             </div>
         </div>
     </nav>
-
+    
+    {{-- Sidebar for Admin --}}
+    @if(Auth::check() && Auth::user()->isAdmin())
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar for admin area -->
-            @if(request()->is('admin*') || request()->is('categories*') || request()->is('products') || request()->is('products/create') || request()->is('products/*/edit'))
             <div class="col-md-2 bg-light sidebar p-0">
                 <div class="position-sticky">
                     <div class="list-group list-group-flush">
@@ -337,13 +297,16 @@
                         <a href="{{ route('categories.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                             <i class="fas fa-list"></i> Quản lý danh mục
                         </a>
+                        <a href="{{ route('brands.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('brands.index') || request()->routeIs('brands.create') || request()->routeIs('brands.edit') ? 'active' : '' }}">
+                            <i class="fas fa-star"></i> Quản lý thương hiệu
+                        </a>
                         <a href="{{ route('products.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') ? 'active' : '' }}">
                             <i class="fas fa-box"></i> Quản lý sản phẩm
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
+                        <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Quản lý người dùng
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
@@ -358,13 +321,17 @@
             <div class="col-md-10 main-content">
                 @yield('content')
             </div>
-            @else
+        </div>
+    </div>
+    @else
+    <div class="container-fluid">
+        <div class="row">
             <div class="col-md-12 main-content">
                 @yield('content')
             </div>
-            @endif
         </div>
     </div>
+    @endif
 
     <!-- Footer -->
     <footer class="text-center py-3 bg-light">

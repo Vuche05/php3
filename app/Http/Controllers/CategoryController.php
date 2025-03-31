@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller {
     public function index() {
-        $categories = Category::all();
+        $categories = Category::latest()->get();
         return view('categories.index', compact('categories'));
     }
 
@@ -17,10 +17,10 @@ class CategoryController extends Controller {
     }
 
     public function store(Request $request) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png',
-            'description' => 'nullable|string',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'description' => 'nullable|string|max:500',
         ]);
 
         $imagePath = null;
@@ -29,12 +29,13 @@ class CategoryController extends Controller {
         }
 
         Category::create([
-            'name' => $request->name,
+            'name' => $validatedData['name'],
             'image' => $imagePath,
-            'description' => $request->description,
+            'description' => $validatedData['description'] ?? null,
         ]);
 
-        return redirect()->route('categories.index')->with('success', 'Danh mục đã được tạo!');
+        return redirect()->route('categories.index')
+            ->with('success', 'Danh mục đã được tạo thành công!');
     }
 
     public function edit(Category $category) {
@@ -42,36 +43,43 @@ class CategoryController extends Controller {
     }
 
     public function update(Request $request, Category $category) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png',
-            'description' => 'nullable|string',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'description' => 'nullable|string|max:500',
         ]);
 
+        $imagePath = $category->image;
         if ($request->hasFile('image')) {
+            // Xóa ảnh cũ nếu tồn tại
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
+            
+            // Lưu ảnh mới
             $imagePath = $request->file('image')->store('categories', 'public');
-        } else {
-            $imagePath = $category->image;
         }
 
         $category->update([
-            'name' => $request->name,
+            'name' => $validatedData['name'],
             'image' => $imagePath,
-            'description' => $request->description,
+            'description' => $validatedData['description'] ?? null,
         ]);
 
-        return redirect()->route('categories.index')->with('success', 'Danh mục đã được cập nhật!');
+        return redirect()->route('categories.index')
+            ->with('success', 'Danh mục đã được cập nhật thành công!');
     }
 
     public function destroy(Category $category) {
+        // Xóa ảnh nếu tồn tại
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }
+
+        // Xóa category
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'Danh mục đã được xóa!');
+        return redirect()->route('categories.index')
+            ->with('success', 'Danh mục đã được xóa thành công!');
     }
 }

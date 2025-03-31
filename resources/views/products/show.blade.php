@@ -40,8 +40,12 @@
             </div>
             
             <div class="d-grid gap-2 d-md-block">
-                <button class="btn btn-primary">Thêm vào giỏ hàng</button>
-                <button class="btn btn-outline-secondary">Mua ngay</button>
+                <form action="{{ route('cart.add') }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-web">Thêm vào giỏ hàng</button>
+                </form>
             </div>
         </div>
     </div>

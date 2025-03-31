@@ -5,33 +5,61 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartController; 
 
 // Home
-Route::get('/', [HomeController::class, 'index']);
-
-// Categories
-Route::resource('categories', CategoryController::class);
-
-// Products
-Route::resource('products', ProductController::class);
-
-// Change this line to match the name used in your template
-Route::get('/products-for-user', [ProductController::class, 'userProducts'])->name('products.user');
-// routes/web.php
-Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Auth Routes
+Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [UserController::class, 'login']);
+Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+
+// // Resource Routes
+Route::resource('categories', CategoryController::class);
+Route::resource('products', ProductController::class);
 Route::resource('brands', BrandController::class);
-Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+// Product Routes for Users
+Route::get('/products-for-user', [ProductController::class, 'userProducts'])->name('products.user');
+Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 
+// Categories (Chỉ Admin có quyền quản lý)
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Thay đổi từ một route đơn lẻ thành resource route
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('users', UserController::class);
+    Route::get('/users', [UserController::class, 'listUsers'])->name('users.index');
+    Route::get('/users/{user}/edit', [UserController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroyUser'])->name('users.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cart}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
+
+Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+Route::post('/profile/delete-avatar', [UserController::class, 'deleteAvatar'])->name('profile.delete.avatar');
+Route::get('/profile/change-password', [UserController::class, 'changePassword'])->name('profile.changePassword');
+Route::put('/profile/update-password', [UserController::class, 'updatePassword'])->name('profile.updatePassword');
+
+//quen mat khau
+Route::get('/quen-mat-khau', [UserController::class, 'forgotPassword'])->name('password.forgot');
+Route::post('/quen-mat-khau', [UserController::class, 'sendResetLink'])->name('password.send-link');
+Route::get('/xac-nhan-otp', [UserController::class, 'verifyOtp'])->name('password.verify-otp');
+Route::post('/xac-nhan-otp', [UserController::class, 'validateOtp'])->name('password.validate-otp');
+Route::get('/dat-lai-mat-khau', [UserController::class, 'showResetForm'])->name('password.reset');
+Route::post('/dat-lai-mat-khau', [UserController::class, 'resetPassword'])->name('password.update');
 
 
 

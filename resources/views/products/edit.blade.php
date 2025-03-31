@@ -22,19 +22,39 @@
                             @enderror
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label for="category_id">Danh mục <span class="text-danger">*</span></label>
-                            <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror" required>
-                                <option value="">-- Chọn danh mục --</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="category_id">Danh mục <span class="text-danger">*</span></label>
+                                    <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror" required>
+                                        <option value="">-- Chọn danh mục --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('category_id')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="brand_id">Thương hiệu <span class="text-danger">*</span></label>
+                                    <select name="brand_id" id="brand_id" class="form-control @error('brand_id') is-invalid @enderror" required>
+                                        <option value="">-- Chọn thương hiệu --</option>
+                                        @foreach ($brands as $brand)
+                                            <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
+                                                {{ $brand->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('brand_id')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row mb-3">
