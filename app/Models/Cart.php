@@ -25,7 +25,7 @@ class Cart extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // Calculate total price for cart item
+    // Tính tổng giá trong giỏ hàng
     public function getTotalPriceAttribute()
     {
         $productPrice = $this->product->price;

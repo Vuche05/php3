@@ -76,7 +76,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="discount">Giảm giá (%)</label>
                                     <input type="number" name="discount" id="discount" min="0" max="100" class="form-control @error('discount') is-invalid @enderror" value="{{ old('discount', $product->discount) }}">
@@ -84,22 +84,64 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
+                        <!-- Primary Image -->
                         <div class="form-group mb-3">
-                            <label for="image">Hình ảnh</label>
-                            @if ($product->image)
-                                <div class="mb-2">
+                            <label for="primary_image">Hình ảnh chính</label>
+                            <div class="mb-2">
+                                @if ($product->primaryImage)
+                                    <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ $product->name }}" style="max-height: 100px;">
+                                @elseif ($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-height: 100px;">
-                                </div>
-                            @endif
-                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
-                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi hình ảnh</small>
-                            @error('image')
+                                @else
+                                    <span class="text-muted">Chưa có hình ảnh chính</span>
+                                @endif
+                            </div>
+                            <input type="file" name="primary_image" id="primary_image" class="form-control @error('primary_image') is-invalid @enderror">
+                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi hình ảnh chính</small>
+                            @error('primary_image')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        <!-- Additional Images -->
+                        <div class="form-group mb-3">
+                            <label for="additional_images">Thêm hình ảnh phụ</label>
+                            <input type="file" name="additional_images[]" id="additional_images" class="form-control @error('additional_images') is-invalid @enderror" multiple>
+                            <small class="form-text text-muted">Có thể chọn nhiều hình ảnh</small>
+                            @error('additional_images')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            @error('additional_images.*')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Existing Additional Images -->
+                        @if ($product->images && $product->images->where('is_primary', false)->count() > 0)
+                            <div class="form-group mb-3">
+                                <label>Hình ảnh phụ hiện tại</label>
+                                <div class="row">
+                                    @foreach ($product->images->where('is_primary', false) as $image)
+                                        <div class="col-md-3 mb-2">
+                                            <div class="card">
+                                                <img src="{{ asset('storage/' . $image->image_path) }}" class="card-img-top" alt="Product image" style="height: 100px; object-fit: cover;">
+                                                <div class="card-body p-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}" id="remove_image_{{ $image->id }}">
+                                                        <label class="form-check-label" for="remove_image_{{ $image->id }}">
+                                                            Xóa
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="form-group mb-3">
                             <label for="description">Mô tả</label>

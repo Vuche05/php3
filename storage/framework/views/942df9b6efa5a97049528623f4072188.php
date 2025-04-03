@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container">
     <div class="row justify-content-center">
@@ -173,14 +171,19 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
 
+                        <!-- Primary Image -->
                         <div class="form-group mb-3">
-                            <label for="image">Hình ảnh</label>
-                            <?php if($product->image): ?>
-                                <div class="mb-2">
+                            <label for="primary_image">Hình ảnh chính</label>
+                            <div class="mb-2">
+                                <?php if($product->primaryImage): ?>
+                                    <img src="<?php echo e(asset('storage/' . $product->primaryImage->image_path)); ?>" alt="<?php echo e($product->name); ?>" style="max-height: 100px;">
+                                <?php elseif($product->image): ?>
                                     <img src="<?php echo e(asset('storage/' . $product->image)); ?>" alt="<?php echo e($product->name); ?>" style="max-height: 100px;">
-                                </div>
-                            <?php endif; ?>
-                            <input type="file" name="image" id="image" class="form-control <?php $__errorArgs = ['image'];
+                                <?php else: ?>
+                                    <span class="text-muted">Chưa có hình ảnh chính</span>
+                                <?php endif; ?>
+                            </div>
+                            <input type="file" name="primary_image" id="primary_image" class="form-control <?php $__errorArgs = ['primary_image'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -188,8 +191,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
-                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi hình ảnh</small>
-                            <?php $__errorArgs = ['image'];
+                            <small class="form-text text-muted">Để trống nếu không muốn thay đổi hình ảnh chính</small>
+                            <?php $__errorArgs = ['primary_image'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -200,6 +203,64 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                         </div>
+
+                        <!-- Additional Images -->
+                        <div class="form-group mb-3">
+                            <label for="additional_images">Thêm hình ảnh phụ</label>
+                            <input type="file" name="additional_images[]" id="additional_images" class="form-control <?php $__errorArgs = ['additional_images'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" multiple>
+                            <small class="form-text text-muted">Có thể chọn nhiều hình ảnh</small>
+                            <?php $__errorArgs = ['additional_images'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="invalid-feedback"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            <?php $__errorArgs = ['additional_images.*'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+
+                        <!-- Existing Additional Images -->
+                        <?php if($product->images && $product->images->where('is_primary', false)->count() > 0): ?>
+                            <div class="form-group mb-3">
+                                <label>Hình ảnh phụ hiện tại</label>
+                                <div class="row">
+                                    <?php $__currentLoopData = $product->images->where('is_primary', false); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="card">
+                                                <img src="<?php echo e(asset('storage/' . $image->image_path)); ?>" class="card-img-top" alt="Product image" style="height: 100px; object-fit: cover;">
+                                                <div class="card-body p-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="remove_image_ids[]" value="<?php echo e($image->id); ?>" id="remove_image_<?php echo e($image->id); ?>">
+                                                        <label class="form-check-label" for="remove_image_<?php echo e($image->id); ?>">
+                                                            Xóa
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 
                         <div class="form-group mb-3">
                             <label for="description">Mô tả</label>

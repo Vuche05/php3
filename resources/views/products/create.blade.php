@@ -75,7 +75,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="discount">Giảm giá (%)</label>
                                     <input type="number" name="discount" id="discount" min="0" max="100" class="form-control @error('discount') is-invalid @enderror" value="{{ old('discount', 0) }}">
@@ -83,14 +83,26 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="image">Hình ảnh</label>
-                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
-                            @error('image')
+                            <label for="primary_image">Hình ảnh chính <span class="text-danger">*</span></label>
+                            <input type="file" name="primary_image" id="primary_image" class="form-control @error('primary_image') is-invalid @enderror">
+                            @error('primary_image')
                                 <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="additional_images">Hình ảnh phụ</label>
+                            <input type="file" name="additional_images[]" id="additional_images" class="form-control @error('additional_images') is-invalid @enderror" multiple>
+                            <small class="form-text text-muted">Có thể chọn nhiều hình ảnh</small>
+                            @error('additional_images')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            @error('additional_images.*')
+                                <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 

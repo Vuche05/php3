@@ -1,6 +1,29 @@
 <?php $__env->startSection('title', 'Đăng nhập'); ?>
 
 <?php $__env->startSection('content'); ?>
+<style>
+    .btn-facebook {
+            background-color: #3b5998;
+            color: white;
+        }
+
+        .btn-facebook:hover {
+            background-color: #ffffff;
+            color: #3b5998;
+            border: 1px solid #3b5998;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+        }
+
+        .btn-google:hover {
+            background-color: #ffffff;
+            color: #db4437;
+            border: 1px solid #db4437;
+        }
+</style>
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -90,6 +113,18 @@ unset($__errorArgs, $__bag); ?>
                             <button type="submit" class="btn btn-web">Đăng nhập</button>
                         </div>
                     </form>
+
+                    <div class="text-center mt-3">
+                        <p>Hoặc đăng nhập bằng:</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/auth/facebook" class="btn btn-facebook social-btn w-100">
+                                <i class="bi bi-facebook me-2"></i> Facebook
+                            </a>
+                            <a href="/auth/google" class="btn btn-google social-btn w-100">
+                                <i class="bi bi-google me-2"></i> Google
+                            </a>
+                        </div>
+                    </div>
 
                     <div class="text-center mt-3">
                         <p>Chưa có tài khoản? <a href="<?php echo e(route('register')); ?>" class="text-web">Đăng ký ngay</a></p>

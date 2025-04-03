@@ -20,6 +20,8 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 // // Resource Routes
 Route::resource('categories', CategoryController::class);
+Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+Route::get('/categories/{category}', [CategoryController::class,'show'])->name('category.show');
 Route::resource('products', ProductController::class);
 Route::resource('brands', BrandController::class);
 
@@ -44,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cart}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 });
 
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
@@ -60,6 +62,13 @@ Route::get('/xac-nhan-otp', [UserController::class, 'verifyOtp'])->name('passwor
 Route::post('/xac-nhan-otp', [UserController::class, 'validateOtp'])->name('password.validate-otp');
 Route::get('/dat-lai-mat-khau', [UserController::class, 'showResetForm'])->name('password.reset');
 Route::post('/dat-lai-mat-khau', [UserController::class, 'resetPassword'])->name('password.update');
+
+//dang nhap voi google va facebook
+Route::get('/auth/google', [UserController::class, 'redirectToGoogle']);
+Route::get('/login/google/callback', [UserController::class, 'handleGoogleCallback']);
+
+Route::get('/auth/facebook', [UserController::class, 'redirectToFacebook']);
+Route::get('/auth/facebook/callback', [UserController::class, 'handleFacebookCallback']);
 
 
 

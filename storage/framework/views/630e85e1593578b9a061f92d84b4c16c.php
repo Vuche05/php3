@@ -195,6 +195,46 @@
         .stats-card.danger {
             border-left-color: #dc3545;
         }
+        
+        /* Multi-level dropdown menu */
+        .dropdown-submenu {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+            z-index: 1000;
+            min-width: 10rem;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.25rem;
+        }
+
+        .dropdown-menu li {
+            position: relative;
+        }
+
+        .dropdown-menu > li:hover > .dropdown-submenu {
+            display: block;
+        }
+
+        /* Optional: Add a hover effect for all dropdown items */
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--web-color);
+        }
+
+        /* Make dropdown items with children display a "right arrow" icon */
+        .dropdown-menu .dropdown-item i.fa-chevron-right {
+            font-size: 0.75rem;
+            margin-top: 0.35rem;
+        }
     </style>
     
     <?php echo $__env->yieldContent('styles'); ?>
@@ -220,12 +260,45 @@
                     </li>
     
                     
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-list"></i> Danh mục
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            <?php $__currentLoopData = App\Models\Category::root()->with('children')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo e(route('home', $category->slug)); ?>">
+                                        <?php echo e($category->name); ?>
+
+                                        <?php if($category->children->count() > 0): ?>
+                                            <i class="fas fa-chevron-right float-end"></i>
+                                        <?php endif; ?>
+                                    </a>
+                                    <?php if($category->children->count() > 0): ?>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            <?php $__currentLoopData = $category->children; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $child): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <li>
+                                                    <a class="dropdown-item" href="<?php echo e(route('home', $child->slug)); ?>">
+                                                        <?php echo e($child->name); ?>
+
+                                                    </a>
+                                                </li>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo e(route('home')); ?>">
+                                    <i class="fas fa-th-list"></i> Tất cả danh mục
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+    
+                    
                     <?php if(Auth::check() && Auth::user()->isAdmin()): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo e(route('categories.index')); ?>">
-                                <i class="fas fa-list"></i> Danh mục
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('products.index')); ?>">
                                 <i class="fas fa-box"></i> Sản phẩm
@@ -241,7 +314,6 @@
                 <div class="d-flex">
                     <a href="<?php echo e(route('cart.index')); ?>" class="btn btn-outline-light me-2">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="badge bg-danger">0</span>
                     </a>
                     
                     <?php if(auth()->guard()->guest()): ?>
@@ -262,8 +334,8 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if(Auth::user()->isAdmin()): ?>
-                                    <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Quản trị
+                                    <li><a class="dropdown-item" href="categories.index">
+                                        
                                     </a></li>
                                 <?php endif; ?>
                                 <li><a class="dropdown-item" href="<?php echo e(url('/profile')); ?>"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
@@ -292,9 +364,7 @@
             <div class="col-md-2 bg-light sidebar p-0">
                 <div class="position-sticky">
                     <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action <?php echo e(request()->is('admin/dashboard') ? 'active' : ''); ?>">
-                            <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
-                        </a>
+                        
                         <a href="<?php echo e(route('categories.index')); ?>" class="list-group-item list-group-item-action <?php echo e(request()->routeIs('categories.*') ? 'active' : ''); ?>">
                             <i class="fas fa-list"></i> Quản lý danh mục
                         </a>
@@ -304,11 +374,11 @@
                         <a href="<?php echo e(route('products.index')); ?>" class="list-group-item list-group-item-action <?php echo e(request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') ? 'active' : ''); ?>">
                             <i class="fas fa-box"></i> Quản lý sản phẩm
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
-                        </a>
                         <a href="<?php echo e(route('users.index')); ?>" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Quản lý người dùng
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-chart-bar"></i> Thống kê báo cáo
@@ -333,13 +403,6 @@
         </div>
     </div>
     <?php endif; ?>
-
-    <!-- Footer -->
-    <footer class="text-center py-3 bg-light">
-        <div class="container">
-            <p class="mb-0">&copy; <?php echo e(date('Y')); ?> Shop Management. Bản quyền thuộc về chúng tôi.</p>
-        </div>
-    </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

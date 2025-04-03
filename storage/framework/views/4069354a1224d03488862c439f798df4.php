@@ -5,7 +5,7 @@
 
     </div>
     <?php endif; ?>
-<div class="container">
+    <div class="container">
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="fw-bold text-web">Trang Chủ</h1>
@@ -50,7 +50,7 @@
                 <h2 class="fw-bold fs-4 mb-0 position-relative">
                     <span class="border-bottom border-3 border-web pb-2">Sản Phẩm</span>
                 </h2>
-                <a href="<?php echo e(route('products.user')); ?>" class="text-decoration-none text-web">Xem tất cả <i class="fas fa-angle-right"></i></a>
+                <a href="#" class="text-decoration-none text-web">Xem tất cả <i class="fas fa-angle-right"></i></a>
             </div>
         </div>
     </div>
@@ -94,8 +94,8 @@
                         <?php endif; ?>
                         <div class="position-absolute add-to-cart">
                             <button class="btn btn-sm btn-web rounded-circle" title="Thêm vào giỏ hàng">
-                                <a href="<?php echo e(route('product.show', $product)); ?>">
-                                    <i class="fas fa-shopping-cart"></i>
+                                <a href="<?php echo e(route('product.show', $product)); ?>" style="color: white;">
+                                    <i class="fas fa-shopping-cart" style="color: white; text-shadow: 0 0 2px #326E51;"></i>
                                 </a>                                
                             </button>
                         </div>
@@ -149,6 +149,7 @@
 
 <?php $__env->startSection('styles'); ?>
 <style>
+
     /* Màu chủ đạo theo yêu cầu */
     :root {
         --web-color: #326E51;

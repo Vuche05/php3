@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
+
 
 class UserController extends Controller
 {
@@ -102,51 +104,6 @@ class UserController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
-    }
-
-    /**
-     * Chuyển hướng đến Google để xác thực
-     */
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    /**
-     * Xử lý callback từ Google
-     */
-    public function handleGoogleCallback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-            
-            // Tìm user theo google_id hoặc email
-            $user = User::where('google_id', $googleUser->id)
-                        ->orWhere('email', $googleUser->email)
-                        ->first();
-                        
-            // Nếu không tìm thấy, tạo user mới
-            if (!$user) {
-                $user = User::create([
-                    'name' => $googleUser->name,
-                    'username' => $this->generateUsername($googleUser->name),
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->avatar,
-                    'password' => Hash::make(rand(1, 10000)), // Mật khẩu ngẫu nhiên
-                    'role' => 'user',
-                ]);
-            } elseif (!$user->google_id) {
-                // Nếu user đã tồn tại nhưng chưa liên kết với Google
-                $user->update(['google_id' => $googleUser->id]);
-            }
-            
-            Auth::login($user);
-            return redirect('/');
-            
-        } catch (\Exception $e) {
-            return redirect('/login')->withErrors(['error' => 'Đăng nhập bằng Google thất bại. Vui lòng thử lại.']);
-        }
     }
 
     /**
@@ -477,5 +434,46 @@ class UserController extends Controller
         }
 
         return back()->with('error', 'Có lỗi xảy ra. Vui lòng thử lại.');
+    }
+
+     // Phương thức đăng nhập Google
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+    
+            Log::info('Dữ liệu từ Google: ', (array) $googleUser);
+    
+            if (!$googleUser->getEmail() || !$googleUser->getId()) {
+                throw new \Exception('Dữ liệu Google không đầy đủ');
+            }
+    
+            $user = User::updateOrCreate(
+                ['email' => $googleUser->getEmail()],
+                [
+                    'username' => $googleUser->getName(),
+                    'password' => bcrypt('google'),
+                    'oauth_provider' => 'google',
+                    'oauth_id' => $googleUser->getId(),
+                ]
+            );
+    
+            Log::info('User sau khi lưu vào database: ', (array) $user);
+    
+            Auth::login($user, true); 
+            session(['user_id' => $user->id]);
+    
+            return redirect()->route('home')->with('success', 'Đăng nhập Google thành công!');
+        } catch (\Exception $e) {
+            Log::error('Lỗi đăng nhập Google: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('login')->with('error', 'Đăng nhập Google thất bại: ' . $e->getMessage());
+        }
     }
 }

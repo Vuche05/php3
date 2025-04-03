@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <style>
     .sidebar {
@@ -82,7 +80,7 @@
                 <?php if(Auth::user()->avatar): ?>
                     <img src="<?php echo e(asset(Auth::user()->avatar)); ?>" alt="Avatar">
                 <?php else: ?>
-                    <img src="https://fullstack.edu.vn/assets/f8-icon-lV2rGpF0.png" alt="Avatar">
+                    <img src="https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg" alt="Avatar">
                 <?php endif; ?>
                 <h2><?php echo e(Auth::user()->username); ?></h2>
             </div>

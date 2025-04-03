@@ -82,7 +82,7 @@
                 @if(Auth::user()->avatar)
                     <img src="{{ asset(Auth::user()->avatar) }}" alt="Avatar">
                 @else
-                    <img src="https://fullstack.edu.vn/assets/f8-icon-lV2rGpF0.png" alt="Avatar">
+                    <img src="https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg" alt="Avatar">
                 @endif
                 <h2>{{ Auth::user()->username }}</h2>
             </div>

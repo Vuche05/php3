@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Đăng ký'); ?>
 
 <?php $__env->startSection('content'); ?>

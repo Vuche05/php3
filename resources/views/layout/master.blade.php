@@ -195,6 +195,46 @@
         .stats-card.danger {
             border-left-color: #dc3545;
         }
+        
+        /* Multi-level dropdown menu */
+        .dropdown-submenu {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+            display: none;
+            z-index: 1000;
+            min-width: 10rem;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.25rem;
+        }
+
+        .dropdown-menu li {
+            position: relative;
+        }
+
+        .dropdown-menu > li:hover > .dropdown-submenu {
+            display: block;
+        }
+
+        /* Optional: Add a hover effect for all dropdown items */
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--web-color);
+        }
+
+        /* Make dropdown items with children display a "right arrow" icon */
+        .dropdown-menu .dropdown-item i.fa-chevron-right {
+            font-size: 0.75rem;
+            margin-top: 0.35rem;
+        }
     </style>
     
     @yield('styles')
@@ -219,13 +259,44 @@
                         </a>
                     </li>
     
+                    {{-- Category Dropdown --}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-list"></i> Danh mục
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            @foreach(App\Models\Category::root()->with('children')->get() as $category)
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('home', $category->slug) }}">
+                                        {{ $category->name }}
+                                        @if($category->children->count() > 0)
+                                            <i class="fas fa-chevron-right float-end"></i>
+                                        @endif
+                                    </a>
+                                    @if($category->children->count() > 0)
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @foreach($category->children as $child)
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('home', $child->slug) }}">
+                                                        {{ $child->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </li>
+                            @endforeach
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('home') }}">
+                                    <i class="fas fa-th-list"></i> Tất cả danh mục
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+    
                     {{-- Admin-Specific Navigation Items --}}
                     @if(Auth::check() && Auth::user()->isAdmin())
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('categories.index') }}">
-                                <i class="fas fa-list"></i> Danh mục
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('products.index') }}">
                                 <i class="fas fa-box"></i> Sản phẩm
@@ -241,7 +312,6 @@
                 <div class="d-flex">
                     <a href="{{ route('cart.index') }}" class="btn btn-outline-light me-2">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="badge bg-danger">0</span>
                     </a>
                     
                     @guest
@@ -261,8 +331,8 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 @if(Auth::user()->isAdmin())
-                                    <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-tachometer-alt me-2"></i>Quản trị
+                                    <li><a class="dropdown-item" href="categories.index">
+                                        {{-- <i class="fas fa-tachometer-alt me-2"></i>Quản trị --}}
                                     </a></li>
                                 @endif
                                 <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
@@ -291,9 +361,9 @@
             <div class="col-md-2 bg-light sidebar p-0">
                 <div class="position-sticky">
                     <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                        {{-- <a href="#" class="list-group-item list-group-item-action {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                             <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
-                        </a>
+                        </a> --}}
                         <a href="{{ route('categories.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                             <i class="fas fa-list"></i> Quản lý danh mục
                         </a>
@@ -303,11 +373,11 @@
                         <a href="{{ route('products.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') ? 'active' : '' }}">
                             <i class="fas fa-box"></i> Quản lý sản phẩm
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
-                        </a>
                         <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Quản lý người dùng
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-chart-bar"></i> Thống kê báo cáo
@@ -332,13 +402,6 @@
         </div>
     </div>
     @endif
-
-    <!-- Footer -->
-    <footer class="text-center py-3 bg-light">
-        <div class="container">
-            <p class="mb-0">&copy; {{ date('Y') }} Shop Management. Bản quyền thuộc về chúng tôi.</p>
-        </div>
-    </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

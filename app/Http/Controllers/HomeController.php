@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller {
     public function index(Request $request) {
-        // Get all categories and brands for the dropdowns
+        // Lấy tất cả danh mục và thương hiệu cho các dropdown
         $categories = Category::all();
         $brands = Brand::all();
         
-        // Start with a base query for products
+        // Bắt đầu với truy vấn cơ bản cho sản phẩm
         $query = Product::with(['category', 'brand']);
         
-        // Apply search filter if provided
+        // Áp dụng bộ lọc tìm kiếm nếu được cung cấp
         if ($request->has('search') && $request->search != '') {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
@@ -25,23 +25,23 @@ class HomeController extends Controller {
             });
         }
         
-        // Apply category filter if provided
+        // Áp dụng bộ lọc danh mục nếu được cung cấp
         if ($request->has('category') && $request->category != '') {
             $query->where('category_id', $request->category);
         }
         
-        // Apply brand filter if provided
+        // Áp dụng bộ lọc thương hiệu nếu được cung cấp
         if ($request->has('brand') && $request->brand != '') {
             $query->where('brand_id', $request->brand);
         }
         
-        // Get paginated results or limited featured products
+        // Lấy kết quả phân trang hoặc sản phẩm nổi bật giới hạn
         if ($request->has('search') || $request->has('category') || $request->has('brand')) {
-            // If searching or filtering, use pagination
+            // Nếu đang tìm kiếm hoặc lọc, sử dụng phân trang
             $featuredProducts = $query->orderBy('created_at', 'desc')
                                       ->paginate(12);
         } else {
-            // If homepage view without search, just get featured products
+            // Nếu xem trang chủ mà không tìm kiếm, chỉ lấy sản phẩm nổi bật
             $featuredProducts = $query->orderBy('created_at', 'desc')
                                       ->take(8)
                                       ->paginate(8);

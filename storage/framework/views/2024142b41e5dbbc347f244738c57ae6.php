@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Quản lý sản phẩm'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -43,10 +41,16 @@
                             <td><?php echo e(number_format($product->price, 0, ',', '.')); ?> đ</td>
                             <td><?php echo e($product->quantity); ?></td>
                             <td>
-                                <?php if($product->image): ?>
+                                <?php if($product->primaryImage): ?>
+                                    <img src="<?php echo e(asset('storage/' . $product->primaryImage->image_path)); ?>" alt="<?php echo e($product->name); ?>" style="max-height: 50px;">
+                                <?php elseif($product->image): ?>
                                     <img src="<?php echo e(asset('storage/' . $product->image)); ?>" alt="<?php echo e($product->name); ?>" style="max-height: 50px;">
                                 <?php else: ?>
                                     <span class="text-muted">Không có hình</span>
+                                <?php endif; ?>
+                                
+                                <?php if($product->images && $product->images->where('is_primary', false)->count() > 0): ?>
+                                    <span class="badge bg-info ms-1">+<?php echo e($product->images->where('is_primary', false)->count()); ?></span>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -69,6 +73,12 @@
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="mt-3">
+            <?php echo e($products->links()); ?>
+
         </div>
     </div>
 </div>

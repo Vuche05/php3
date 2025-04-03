@@ -42,10 +42,16 @@
                             <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
                             <td>{{ $product->quantity }}</td>
                             <td>
-                                @if ($product->image)
+                                @if ($product->primaryImage)
+                                    <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ $product->name }}" style="max-height: 50px;">
+                                @elseif ($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-height: 50px;">
                                 @else
                                     <span class="text-muted">Không có hình</span>
+                                @endif
+                                
+                                @if ($product->images && $product->images->where('is_primary', false)->count() > 0)
+                                    <span class="badge bg-info ms-1">+{{ $product->images->where('is_primary', false)->count() }}</span>
                                 @endif
                             </td>
                             <td>
@@ -68,6 +74,11 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="mt-3">
+            {{ $products->links() }}
         </div>
     </div>
 </div>

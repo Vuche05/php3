@@ -32,19 +32,16 @@ class CartController extends Controller
 
             $product = Product::findOrFail($request->product_id);
 
-            // Check product availability
             if ($product->quantity < $request->quantity) {
                 return redirect()->back()->with('error', 'Số lượng sản phẩm không đủ!');
             }
 
-            // Use transaction for atomic operation
             DB::transaction(function () use ($product, $request) {
                 $cartItem = Cart::where('user_id', Auth::id())
                     ->where('product_id', $product->id)
                     ->first();
 
                 if ($cartItem) {
-                    // Check total quantity
                     $newQuantity = $cartItem->quantity + $request->quantity;
                     if ($newQuantity > $product->quantity) {
                         throw new \Exception('Vượt quá số lượng sản phẩm trong kho');
@@ -73,7 +70,6 @@ class CartController extends Controller
                 'quantity' => 'required|integer|min:1'
             ]);
 
-            // Verify ownership and product availability
             if ($cart->user_id !== Auth::id()) {
                 return redirect()->back()->with('error', 'Bạn không có quyền thực hiện thao tác này!');
             }
@@ -94,7 +90,6 @@ class CartController extends Controller
     public function remove(Cart $cart)
     {
         try {
-            // Verify ownership
             if ($cart->user_id !== Auth::id()) {
                 return redirect()->back()->with('error', 'Bạn không có quyền thực hiện thao tác này!');
             }
