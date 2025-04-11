@@ -35,6 +35,13 @@ return [
         ],
     ],
 
+    'vnpay' => [
+    'tmn_code' => env('VNPAY_TMN_CODE'),
+    'hash_secret' => env('VNPAY_HASH_SECRET'),
+    'url' => env('VNPAY_URL'),
+    'callback_url' => env('VNPAY_CALLBACK_URL'),
+    ],
+
     'google' => [
     'client_id' => env('GOOGLE_CLIENT_ID'),
     'client_secret' => env('GOOGLE_CLIENT_SECRET'),

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -248,20 +249,37 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|string|max:255',
             'fullname' => 'nullable|string|max:255',
+            'email' => 'required|email|max:255',
             'password' => 'nullable|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'district' => 'nullable|string|max:100',
+            'ward' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
         ], [
             'username.required' => 'Vui lòng nhập tên người dùng',
             'fullname.max' => 'Họ và tên không được vượt quá 255 ký tự',
+            'email.required' => 'Vui lòng nhập email',
+            'email.email' => 'Email không đúng định dạng',
             'password.min' => 'Mật khẩu phải ít nhất 6 ký tự',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp',
             'avatar.image' => 'Ảnh đại diện phải là định dạng ảnh hợp lệ',
             'avatar.mimes' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg, gif',
             'avatar.max' => 'Ảnh đại diện không được vượt quá 2MB',
+            'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự',
         ]);
 
         $user->username = $request->username;
+        $user->email = $request->email;
         $user->fullname = $request->fullname;
+        
+        // Update address information
+        $user->address = $request->address;
+        $user->city = $request->city;
+        $user->district = $request->district;
+        $user->ward = $request->ward;
+        $user->phone = $request->phone;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
@@ -280,11 +298,7 @@ class UserController extends Controller
         }
 
         if ($user instanceof User) {
-            if ($user instanceof User) {
-                $user->save();
-            } else {
-                return back()->with('error', 'Không tìm thấy người dùng hợp lệ');
-            }
+            $user->save();
         } else {
             return back()->with('error', 'Không tìm thấy người dùng hợp lệ');
         }
@@ -475,5 +489,79 @@ class UserController extends Controller
             ]);
             return redirect()->route('login')->with('error', 'Đăng nhập Google thất bại: ' . $e->getMessage());
         }
+    }
+
+    //address
+    public function address()
+    {
+        $title = "Thêm địa chỉ";
+        $user = Auth::user();
+        $addresses = $user->addresses ?? collect();
+        Log::info('Addresses:', ['addresses' => $addresses]);
+        return view('profile.addresses', compact('addresses', 'title', 'user'));
+    }
+
+    public function storeAddress(Request $request)
+    {
+        $request->validate([
+            'receiver_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'province' => 'required|string',
+            'district' => 'required|string',
+            'ward' => 'required|string',
+            'street' => 'required|string',
+            'is_default' => 'nullable|boolean',
+        ], [
+            'receiver_name.required' => 'Vui lòng nhập tên người nhận',
+            'phone.required' => 'Vui lòng nhập số điện thoại',
+            'phone.max' => 'Số điện thoại không được vượt quá 15 ký tự',
+            'province.required' => 'Vui lòng chọn tỉnh/thành phố',
+            'district.required' => 'Vui lòng chọn quận/huyện',
+            'ward.required' => 'Vui lòng chọn xã/phường',
+            'street.required' => 'Vui lòng nhập địa chỉ cụ thể',
+        ]);
+
+        $user = Auth::user();
+
+        $address = new Address([
+            'user_id' => $user->id,
+            'receiver_name' => $request->receiver_name,
+            'phone' => $request->phone,
+            'province' => $request->province,
+            'district' => $request->district,
+            'ward' => $request->ward,
+            'street' => $request->street,
+            'is_default' => $request->is_default ? true : false,
+        ]);
+
+        if ($request->is_default) {
+            Address::where('user_id', $user->id)->update(['is_default' => false]);
+        }
+
+        $address->save();
+
+        return redirect()->route('profile.addresses')->with('success', 'Thêm địa chỉ thành công');
+    }
+
+    public function setAddress($id)
+    {
+        $address = Address::findOrFail($id);
+        $user = Auth::user();
+        if ($address->user_id !== $user->id) {
+            return redirect()->route('profile.addresses')
+                ->with('error', 'Địa chỉ không thuộc về bạn.');
+        }
+        Address::where('user_id', $user->id)->update(['is_default' => false]);
+        $address->is_default = true;
+        $address->save();
+
+        return redirect()->route('profile.addresses')
+            ->with('success', 'Đặt địa chỉ mặc định thành công.');
+    }
+    public function deleteAddress($id)
+    {
+        $address = Address::findOrFail($id);
+        $address->delete();
+        return redirect()->route('profile.address')->with('success', 'Xóa địa chỉ thành cong');
     }
 }

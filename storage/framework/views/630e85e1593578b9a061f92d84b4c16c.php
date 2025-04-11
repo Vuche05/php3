@@ -258,7 +258,7 @@
                             <i class="fas fa-home"></i> Trang chủ
                         </a>
                     </li>
-    
+            
                     
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -296,7 +296,7 @@
                             </li>
                         </ul>
                     </li>
-    
+            
                     
                     <?php if(Auth::check() && Auth::user()->isAdmin()): ?>
                         <li class="nav-item">
@@ -310,7 +310,17 @@
                             </a>
                         </li>
                     <?php endif; ?>
+                    
+                    
+                    <?php if(auth()->guard()->check()): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo e(route('checkout.list')); ?>">
+                            <i class="fas fa-clipboard-list"></i> Đơn hàng của tôi
+                        </a>
+                    </li>
+                    <?php endif; ?>
                 </ul>
+                
                 <div class="d-flex">
                     <a href="<?php echo e(route('cart.index')); ?>" class="btn btn-outline-light me-2">
                         <i class="fas fa-shopping-cart"></i>
@@ -334,11 +344,11 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <?php if(Auth::user()->isAdmin()): ?>
-                                    <li><a class="dropdown-item" href="categories.index">
-                                        
+                                    <li><a class="dropdown-item" href="<?php echo e(route('categories.index')); ?>">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Quản trị
                                     </a></li>
                                 <?php endif; ?>
-                                <li><a class="dropdown-item" href="<?php echo e(url('/profile')); ?>"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
+                                <li><a class="dropdown-item" href="<?php echo e(url('/profile/address')); ?>"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -374,11 +384,14 @@
                         <a href="<?php echo e(route('products.index')); ?>" class="list-group-item list-group-item-action <?php echo e(request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') ? 'active' : ''); ?>">
                             <i class="fas fa-box"></i> Quản lý sản phẩm
                         </a>
+                        <a href="<?php echo e(route('coupon.index')); ?>" class="list-group-item list-group-item-action" <?php echo e(request()->routeIs('coupons.index') || request()->routeIs('coupons.create') || request()->routeIs('coupons.edit') ? 'active' : ''); ?>>
+                            <i class="fas fa-tags"></i> Quản lý mã giảm giá
+                        </a>
+                        <a href="<?php echo e(route('admin.orders.index')); ?>" class="list-group-item list-group-item-action <?php echo e(request()->routeIs('admin.orders.*') ? 'active' : ''); ?>">
+                            <i class="fas fa-shopping-bag"></i> Quản lý đơn hàng
+                        </a>
                         <a href="<?php echo e(route('users.index')); ?>" class="list-group-item list-group-item-action">
                             <i class="fas fa-users"></i> Quản lý người dùng
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-chart-bar"></i> Thống kê báo cáo

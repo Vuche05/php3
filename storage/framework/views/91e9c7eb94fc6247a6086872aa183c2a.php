@@ -59,6 +59,42 @@
             background-color: #e55a00;
             border-color: #e55a00;
         }
+        
+        .address-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .address-type {
+            background-color: #f0f2f5;
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .default-badge {
+            background-color: #326E51;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        
+        .address-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .address-tabs {
+            margin-bottom: 20px;
+        }
     </style>
     <div class="container mt-3">
         <div class="row">
@@ -69,7 +105,10 @@
                         <a class="nav-link active" href="<?php echo e(url('/profile')); ?>">Thông tin</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo e(route('profile.changePassword')); ?>">Đổi mật khẩu</a>
+                        <a class="nav-link" href="<?php echo e(url('/profile/address')); ?>">Địa chỉ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo e(url('/profile/changePassword')); ?>">Đổi mật khẩu</a>
                     </li>
                 </ul>
             </div>
@@ -88,8 +127,6 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Thông tin cá nhân</h5>
-                        <form class="profile-form" action="<?php echo e(route('profile.update')); ?>" method="POST"
-                            enctype="multipart/form-data">
 
                         <?php if(session('success')): ?>
                             <div class="alert alert-success">
@@ -112,7 +149,7 @@
                                 </ul>
                             </div>
                         <?php endif; ?>
-                        <form action="<?php echo e(route('profile.update')); ?>" method="POST" enctype="multipart/form-data">
+                        <form class="profile-form" action="<?php echo e(route('profile.update')); ?>" method="POST" enctype="multipart/form-data">
                             <?php echo csrf_field(); ?>
                             <?php echo method_field('PUT'); ?>
                             <div class="mb-3">
@@ -130,6 +167,13 @@
                                 <input type="text" class="form-control" id="fullname" name="fullname"
                                     value="<?php echo e(old('fullname', $user->fullname)); ?>">
                             </div>
+                            
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="phone" name="phone"
+                                    value="<?php echo e(old('phone', $user->phone ?? '')); ?>">
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="avatar" class="form-label">Ảnh đại diện:</label>
                                 <input type="file" class="form-control" id="avatar" name="avatar">
@@ -156,6 +200,8 @@ unset($__errorArgs, $__bag); ?>
                         </form>
                     </div>
                 </div>
+                
+                
             </div>
         </div>
     </div>

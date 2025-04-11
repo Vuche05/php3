@@ -66,7 +66,7 @@
                 </tr>
             </tfoot>
         </table>
-        <a href="#" class="btn btn-success">Thanh Toán</a>
+        <a href="{{ route('checkout.index') }}" class="btn btn-success">Thanh Toán</a>
     @else
         <p>Giỏ hàng của bạn đang trống.</p>
     @endif

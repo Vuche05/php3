@@ -7,7 +7,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CartController; 
-
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\OrderController;
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -49,11 +52,51 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 });
 
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
+    Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::post('/orders/{order}/notification', [OrderController::class, 'sendNotification'])->name('orders.send_notification');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
+    Route::get('/checkout/list', [CheckoutController::class, 'list'])->name('checkout.list');
+    Route::get('/checkout/show/{order}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::patch('/checkout/{order}/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
+    Route::get('/orders/{order}/rebuy', [CheckoutController::class, 'rebuy'])->name('checkout.rebuy');
+    
+    Route::get('/checkout/vnpay-return', [CheckoutController::class, 'vnpayReturn'])->name('checkout.vnpay.return');
+    
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/checkout/update-shipping', [CheckoutController::class, 'updateShipping'])->name('checkout.update_shipping');
+    Route::post('/checkout/validate-discount', [CheckoutController::class, 'validateDiscount'])->name('checkout.validate_discount');
+});
+
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 Route::post('/profile/delete-avatar', [UserController::class, 'deleteAvatar'])->name('profile.delete.avatar');
 Route::get('/profile/change-password', [UserController::class, 'changePassword'])->name('profile.changePassword');
 Route::put('/profile/update-password', [UserController::class, 'updatePassword'])->name('profile.updatePassword');
+
+Route::get('/profile/address', [UserController::class, 'address'])->name('profile.address');
+Route::post('/profile/address/store', [UserController::class, 'storeAddress'])->name('profile.storeAddress');
+Route::post('/profile/address/set-default/{id}', [UserController::class, 'setAddress'])->name('profile.setAddress');
+Route::delete('/profile/address/delete/{id}', [UserController::class, 'deleteAddress'])->name('profile.deleteAddress');
+
+
+
+// API lấy dữ liệu tỉnh, quận, phường
+Route::middleware(['auth'])->group(function () {
+    Route::get('/api/provinces', [AddressController::class, 'getProvinces']);
+    Route::get('/api/districts', [AddressController::class, 'getDistricts']);
+    Route::get('/api/wards', [AddressController::class, 'getWards']);
+});
 
 //quen mat khau
 Route::get('/quen-mat-khau', [UserController::class, 'forgotPassword'])->name('password.forgot');
@@ -70,7 +113,23 @@ Route::get('/login/google/callback', [UserController::class, 'handleGoogleCallba
 Route::get('/auth/facebook', [UserController::class, 'redirectToFacebook']);
 Route::get('/auth/facebook/callback', [UserController::class, 'handleFacebookCallback']);
 
+Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply'); 
+Route::get('/coupon/remove', [CouponController::class, 'remove'])->name('coupon.remove');
+Route::get('/coupon', [CouponController::class, 'index'])->name('coupon.index');
+Route::get('/coupon/create', [CouponController::class, 'create'])->name('coupon.create');
+Route::post('/coupon', [CouponController::class, 'store'])->name('coupon.store');
+Route::get('/coupon/generate-code', [CouponController::class, 'generateCode'])->name('coupon.generate-code');
+Route::get('/coupon/{coupon}/edit', [CouponController::class, 'edit'])->name('coupon.edit');
+Route::put('/coupon/{coupon}', [CouponController::class, 'update'])->name('coupon.update');
+Route::delete('/coupon/{coupon}', [CouponController::class, 'destroy'])->name('coupon.destroy'); 
 
+// In routes/web.php, inside the middleware(['auth', 'admin']) group, add:
+// Route::prefix('admin')->name('admin.')->group(function () {
+//     Route::get('/orders', [CheckoutController::class, 'adminIndex'])->name('orders.index');
+//     Route::get('/orders/{order}', [CheckoutController::class, 'adminShow'])->name('orders.show');
+//     Route::put('/orders/{order}/status', [CheckoutController::class, 'updateStatus'])->name('orders.update.status');
+//     Route::get('/orders/{order}/edit', [CheckoutController::class, 'adminEdit'])->name('orders.edit');
+// });
 
 // Route::get('/info/{id}', function(string $id) {
 //     $sinhviens = array(

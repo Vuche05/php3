@@ -67,7 +67,7 @@
                 </tr>
             </tfoot>
         </table>
-        <a href="#" class="btn btn-success">Thanh Toán</a>
+        <a href="<?php echo e(route('checkout.index')); ?>" class="btn btn-success">Thanh Toán</a>
     <?php else: ?>
         <p>Giỏ hàng của bạn đang trống.</p>
     <?php endif; ?>

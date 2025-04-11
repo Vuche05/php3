@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title', 'Hệ thống quản lý')</title>
+    <title>@yield('title', 'VSKINCARE - Sản phẩm chăm sóc da')</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -58,31 +58,6 @@
             font-weight: bold;
         }
         
-        /* Sidebar styles */
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar .nav-link {
-            color: #333;
-            border-radius: 0;
-            padding: 0.8rem 1rem;
-        }
-        
-        .sidebar .nav-link:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .sidebar .nav-link.active {
-            background-color: var(--web-color);
-            color: white;
-        }
-        
-        .sidebar .nav-link i {
-            margin-right: 10px;
-        }
-        
         /* Main content area */
         .main-content {
             padding: 20px;
@@ -105,16 +80,6 @@
             background-color: #f8f9fa;
             border-bottom: 1px solid rgba(0, 0, 0, 0.125);
             font-weight: bold;
-        }
-        
-        /* Table styles */
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        /* Buttons in forms */
-        .form-group button {
-            margin-right: 5px;
         }
         
         /* Product cards */
@@ -173,27 +138,6 @@
             bottom: 10px;
             right: 10px;
             z-index: 2;
-        }
-        
-        /* Dashboard stats */
-        .stats-card {
-            border-left: 4px solid;
-        }
-        
-        .stats-card.primary {
-            border-left-color: var(--web-color);
-        }
-        
-        .stats-card.success {
-            border-left-color: var(--web-color);
-        }
-        
-        .stats-card.warning {
-            border-left-color: #ffc107;
-        }
-        
-        .stats-card.danger {
-            border-left-color: #dc3545;
         }
         
         /* Multi-level dropdown menu */
@@ -258,7 +202,7 @@
                             <i class="fas fa-home"></i> Trang chủ
                         </a>
                     </li>
-    
+            
                     {{-- Category Dropdown --}}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -294,21 +238,17 @@
                             </li>
                         </ul>
                     </li>
-    
-                    {{-- Admin-Specific Navigation Items --}}
-                    @if(Auth::check() && Auth::user()->isAdmin())
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('products.index') }}">
-                                <i class="fas fa-box"></i> Sản phẩm
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('brands.index') }}">
-                                <i class="fas fa-star"></i> Thương hiệu
-                            </a>
-                        </li>
-                    @endif
+                    
+                    {{-- My Orders - Only show for logged in users --}}
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('checkout.list') }}">
+                            <i class="fas fa-clipboard-list"></i> Đơn hàng của tôi
+                        </a>
+                    </li>
+                    @endauth
                 </ul>
+                
                 <div class="d-flex">
                     <a href="{{ route('cart.index') }}" class="btn btn-outline-light me-2">
                         <i class="fas fa-shopping-cart"></i>
@@ -331,11 +271,11 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 @if(Auth::user()->isAdmin())
-                                    <li><a class="dropdown-item" href="categories.index">
-                                        {{-- <i class="fas fa-tachometer-alt me-2"></i>Quản trị --}}
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Quản trị
                                     </a></li>
                                 @endif
-                                <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
+                                <li><a class="dropdown-item" href="{{ url('/profile/address') }}"><i class="fas fa-user-circle me-2"></i>Thông tin</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -354,54 +294,67 @@
         </div>
     </nav>
     
-    {{-- Sidebar for Admin --}}
-    @if(Auth::check() && Auth::user()->isAdmin())
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2 bg-light sidebar p-0">
-                <div class="position-sticky">
-                    <div class="list-group list-group-flush">
-                        {{-- <a href="#" class="list-group-item list-group-item-action {{ request()->is('admin/dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-tachometer-alt"></i> Bảng điều khiển
-                        </a> --}}
-                        <a href="{{ route('categories.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                            <i class="fas fa-list"></i> Quản lý danh mục
-                        </a>
-                        <a href="{{ route('brands.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('brands.index') || request()->routeIs('brands.create') || request()->routeIs('brands.edit') ? 'active' : '' }}">
-                            <i class="fas fa-star"></i> Quản lý thương hiệu
-                        </a>
-                        <a href="{{ route('products.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('products.index') || request()->routeIs('products.create') || request()->routeIs('products.edit') ? 'active' : '' }}">
-                            <i class="fas fa-box"></i> Quản lý sản phẩm
-                        </a>
-                        <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-users"></i> Quản lý người dùng
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-chart-bar"></i> Thống kê báo cáo
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-cog"></i> Cài đặt hệ thống
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-10 main-content">
-                @yield('content')
-            </div>
-        </div>
-    </div>
-    @else
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 main-content">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
                 @yield('content')
             </div>
         </div>
     </div>
-    @endif
+
+    <footer class="bg-web text-white mt-4">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>Về VSKINCARE</h5>
+                    <p>Chuyên cung cấp các sản phẩm chăm sóc da chính hãng, chất lượng cao với giá cả hợp lý.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Thông tin liên hệ</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Đường ABC, Quận 1, TP HCM</li>
+                        <li><i class="fas fa-phone me-2"></i> 0123 456 789</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@vskincare.com</li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Chính sách</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-white">Chính sách vận chuyển</a></li>
+                        <li><a href="#" class="text-white">Chính sách đổi trả</a></li>
+                        <li><a href="#" class="text-white">Điều khoản dịch vụ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Kết nối với chúng tôi</h5>
+                    <div class="d-flex">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-tiktok fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center py-3 border-top border-light">
+            <p class="mb-0">© 2025 VSKINCARE. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
